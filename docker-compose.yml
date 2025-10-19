@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  network-ai-assistant:
+    build: .
+    container_name: network-ai-assistant
+    ports:
+      - "8501:8501"  # Streamlit default port
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    volumes:
+      - .:/app
+    network_mode: host
+
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    command: tunnel --url http://localhost:8501
+    network_mode: host
+    profiles:
+      - cloudflare
+    depends_on:
+      - network-ai-assistant
